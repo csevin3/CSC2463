@@ -50,7 +50,7 @@ function setup() {
 
 
 function draw() {
-  background(100, 100, 150);
+  background(200,100,100);
   text("Play A through K and use sliders to add effects", 75, 100);
   text("Pitchbend", 50, 163);
   text("PingPong", 50, 213);
