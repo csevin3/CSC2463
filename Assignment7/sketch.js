@@ -36,5 +36,6 @@ function draw() {
 }
 
 function mousePressed() {
+  // Trigger car horn sound
   env.triggerAttackRelease(1);
 }
