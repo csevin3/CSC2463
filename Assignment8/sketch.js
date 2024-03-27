@@ -68,13 +68,11 @@ let timeLimit = 30;
 function preload() {
   squishImage = loadImage('assets/squish.png');
   music = document.getElementById('music');
-  music = loadSound('assets/music.mp3');
 }
 
 function setup() {
   createCanvas(400, 400);
   
-  let music = document.getElementById('music');
   music.play();
 
   for (let i = 0; i < numBugs; i++) {
