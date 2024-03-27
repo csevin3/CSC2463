@@ -119,11 +119,13 @@ function mouseClicked() {
     }
   }
   if (!bugClicked && !gameOver) {
+    // Play slip sound only if no bug is clicked and the game is not over
     let slipSound = document.getElementById('slipSound');
-    slipSound.pause();
-    slipSound.currentTime = 0;
     slipSound.play();
   }
+
+  // Play squish sound after user interaction
+  let squishSound = document.getElementById('squishSound');
+  squishSound.currentTime = 0; // Reset playback position to the beginning
+  squishSound.play();
 }
-
-
