@@ -73,6 +73,7 @@ function preload() {
 function setup() {
   createCanvas(400, 400);
   
+  let music = document.getElementById('music');
   music.play();
 
   for (let i = 0; i < numBugs; i++) {
