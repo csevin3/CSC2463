@@ -73,6 +73,7 @@ function preload() {
 function setup() {
   createCanvas(400, 400);
   
+  let music = document.getElementById('music');
   music.play();
 
   for (let i = 0; i < numBugs; i++) {
@@ -114,17 +115,17 @@ function mouseClicked() {
   for (let i = 0; i < bugs.length; i++) {
     if (bugs[i].handleClick()) {
       bugClicked = true;
+      // Play squish sound when a bug is clicked
+      let squishSound = document.getElementById('squishSound');
+      squishSound.currentTime = 0; // Reset playback position to the beginning
+      squishSound.play();
       break;
     }
   }
   if (!bugClicked && !gameOver) {
-    // Play slip sound only if no bug is clicked and the game is not over
+    // Play slip sound regardless of its current playback state
     let slipSound = document.getElementById('slipSound');
+    slipSound.currentTime = 0; // Reset playback position to the beginning
     slipSound.play();
   }
-
-  // Play squish sound after user interaction
-  let squishSound = document.getElementById('squishSound');
-  squishSound.currentTime = 0; // Reset playback position to the beginning
-  squishSound.play();
 }
