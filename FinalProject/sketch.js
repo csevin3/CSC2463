@@ -21,8 +21,7 @@ let frameDelay = 10; // Number of frames to wait before advancing to the next fr
 
 function preload() {
   // Load the spritesheet
-  slimeSheet = loadImage('Assets/slime.png');
-  //aaaaa
+  slimeSheet = loadImage('assets/slime.png');
 }
 
 function setup() {
