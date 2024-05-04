@@ -1,11 +1,11 @@
 let playerHP = 100;
 let playerMP = 50;
-let goblinHP = 80;
+let slimeHP = 80;
 let gameLog = "";
 
 // Declare variables for damage and heal ranges
-let minBasicDamage = 5;
-let maxBasicDamage = 10;
+let minPunchDamage = 5; // Changed from minBasicDamage to minPunchDamage
+let maxPunchDamage = 10; // Changed from maxBasicDamage to maxPunchDamage
 let minFireballDamage = 10;
 let maxFireballDamage = 25;
 let minHeal = 20;
@@ -29,10 +29,10 @@ function setup() {
   frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
   frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
   
-  let AttackButton = createButton('Basic Attack');
-  AttackButton.position(50, 250);
-  AttackButton.size(150,50);
-  AttackButton.mousePressed(basicAttack);
+  let PunchButton = createButton('Punch'); // Changed from Basic Attack to Punch
+  PunchButton.position(50, 250);
+  PunchButton.size(150,50);
+  PunchButton.mousePressed(punch); // Changed from basicAttack to punch
 
   let FireballButton = createButton('Fireball');
   FireballButton.position(50,325);
@@ -44,10 +44,10 @@ function setup() {
   HealButton.size(150,50);
   HealButton.mousePressed(heal);
 
-  let EmpowerButton = createButton('Empower')
-  EmpowerButton.position(225,325);
-  EmpowerButton.size(150,50)
-  EmpowerButton.mousePressed(empower);
+  let ChargeButton = createButton('Charge') // Changed from Empower to Charge
+  ChargeButton.position(225,325); // Changed from Empower to Charge
+  ChargeButton.size(150,50) // Changed from Empower to Charge
+  ChargeButton.mousePressed(charge); // Changed from empower to charge
   
   // Create a textarea for game log
   gameLogArea = createElement('textarea');
@@ -82,15 +82,15 @@ function draw() {
   textAlign(LEFT, CENTER);
   text(`Player HP: ${playerHP}/100`, 50, 50);
   text(`MP: ${playerMP}/50`, 50, 80);
-  text(`Goblin HP: ${goblinHP}/80`, 50, 110);
+  text(`Slime HP: ${slimeHP}/80`, 50, 110);
   
   // Update game log content
   gameLogArea.value(gameLog);
 
   gameLogArea.elt.scrollTop = gameLogArea.elt.scrollHeight;
 
-  // Check if goblin's health is 0 or below, display YOU WIN if true
-  if (goblinHP <= 0) {
+  // Check if slime's health is 0 or below, display YOU WIN if true
+  if (slimeHP <= 0) {
     fill(0, 255, 0); // Green color
     textSize(32);
     textAlign(CENTER, TOP);
@@ -105,27 +105,27 @@ function draw() {
   }
 }
 
-function basicAttack() {
+function punch() { // Changed from basicAttack to punch
   if (generateRandomHitChance()) {
-    let damage = generateRandomDamage(5, 10);
-    goblinHP -= damage;
-    gameLog += "Player used basic attack! It did " + damage + " damage to goblin!\n";
+    let damage = generateRandomDamage(5, 10); // Changed from minBasicDamage to minPunchDamage, maxBasicDamage to maxPunchDamage
+    slimeHP -= damage;
+    gameLog += "Player used punch! It did " + damage + " damage to slime!\n"; // Changed from basic attack to punch
   } else {
-    gameLog += "Your Basic Attack missed!\n";
+    gameLog += "Your Punch missed!\n"; // Changed from Your Basic Attack missed! to Your Punch missed!
   }
-  goblinTurn();
+  slimeTurn();
 }
 
 function fireball() {
   if (playerMP >= 6) {
     let damage = generateRandomDamage(10, 25);
-    goblinHP -= damage;
+    slimeHP -= damage;
     playerMP -= 6;
-    gameLog += "Player used fireball! It did " + damage + " damage to goblin!\n";
+    gameLog += "Player used fireball! It did " + damage + " damage to slime!\n";
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
   }
-  goblinTurn();
+  slimeTurn();
 }
 
 function heal() {
@@ -138,45 +138,45 @@ function heal() {
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
   }
-  goblinTurn();
+  slimeTurn();
 }
 
-function empower() {
+function charge() { // Changed from empower to charge
   if (playerMP >= 10) {
     playerMP -= 10;
-    minBasicDamage += 1;
-    maxBasicDamage += 2;
+    minPunchDamage += 1; // Changed from minBasicDamage to minPunchDamage
+    maxPunchDamage += 2; // Changed from maxBasicDamage to maxPunchDamage
     minFireballDamage += 1;
     maxFireballDamage += 2;
     minHeal += 1;
     maxHeal += 2;
-    gameLog += "Player used Empower and now has increased damage and healing!\n";
+    gameLog += "Player used Charge and now has increased damage and healing!\n"; // Changed from Empower to Charge
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
   }
-  goblinTurn();
+  slimeTurn();
 }
 
-function goblinTurn() {
-  if (goblinHP <= 0) {
-    gameLog += "You have defeated the goblin! Congratulations!\n";
+function slimeTurn() {
+  if (slimeHP <= 0) {
+    gameLog += "You have defeated the slime! Congratulations!\n";
     return;
   }
 
-  let goblinTotalDamage = 0;
+  let slimeTotalDamage = 0;
   for (let i = 0; i < 2; i++) {
     if (generateRandomHitChance()) {
       let damage = generateRandomDamage(3, 7);
-      goblinTotalDamage += damage;
-      gameLog += "Goblin hit you for " + damage + " damage!\n";
+      slimeTotalDamage += damage;
+      gameLog += "Slime hit you for " + damage + " damage!\n"; // Changed from goblin to slime
     } else {
-      gameLog += "Goblin's attack missed!\n";
+      gameLog += "Slime's attack missed!\n"; // Changed from goblin's to slime's
     }
   }
-  playerHP -= goblinTotalDamage;
+  playerHP -= slimeTotalDamage;
 
   if (playerHP <= 0) {
-    gameLog += "You have been defeated by the goblin! Game over!\n";
+    gameLog += "You have been defeated by the slime! Game over!\n"; // Changed from goblin to slime
     return;
   }
 }
