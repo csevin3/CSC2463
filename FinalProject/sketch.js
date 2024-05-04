@@ -39,7 +39,7 @@ function setup() {
   // Create a textarea for game log
   gameLogArea = createElement('textarea');
   gameLogArea.position(0, 120);
-  gameLogArea.size(200, 120);
+  gameLogArea.size(200, 100);
   gameLogArea.attribute('readonly', '');
 }
 
@@ -114,8 +114,25 @@ function empower() {
 
 function goblinTurn() {
   if (goblinHP <= 0) {
-    gameLog += "You have defeated the goblin! Congratulations!\n";
-    return;
+    fill(0, 255, 0); // Green color
+    textSize(32);
+    textAlign(CENTER, TOP);
+    text("YOU WIN", width / 2, 10); // Display at the top with a margin of 10 pixels
+    noLoop(); // Stop the draw loop to prevent further updates
+  } else if (playerHP <= 0) {
+    fill(255, 0, 0); // Red color
+    textSize(32);
+    textAlign(CENTER, TOP);
+    text("GAME OVER", width / 2, 10); // Display at the top with a margin of 10 pixels
+    noLoop(); // Stop the draw loop to prevent further updates
+  } else {
+    // Display player's health and mana points
+    fill(0);
+    textSize(16);
+    textAlign(LEFT, CENTER);
+    text(`Player HP: ${playerHP}/100`, 50, 50);
+    text(`MP: ${playerMP}/50`, 50, 80);
+    text(`Goblin HP: ${goblinHP}/80`, 50, 110);
   }
 
   let goblinTotalDamage = 0;
@@ -131,9 +148,18 @@ function goblinTurn() {
   playerHP -= goblinTotalDamage;
 
   if (playerHP <= 0) {
-    gameLog += "You have been defeated by the goblin! Game over!\n";
-    return;
+    fill(255, 0, 0); // Red color
+    textSize(32);
+    textAlign(CENTER, TOP);
+    text("GAME OVER", width / 2, 10); // Display at the top with a margin of 10 pixels
+    noLoop(); // Stop the draw loop to prevent further updates
   }
+}
+
+function gameOver() {
+  gameLog += "You have been defeated by the goblin! Game over!\n";
+  // Display game over message or any other actions you want to take
+  // For example, you could stop further actions here or reset the game.
 }
 
 function generateRandomDamage(min, max) {
