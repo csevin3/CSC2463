@@ -4,8 +4,8 @@ let slimeHP = 80;
 let gameLog = "";
 
 // Declare variables for damage and heal ranges
-let minPunchDamage = 5; // Changed from minBasicDamage to minPunchDamage
-let maxPunchDamage = 10; // Changed from maxBasicDamage to maxPunchDamage
+let minPunchDamage = 5;
+let maxPunchDamage = 10;
 let minFireballDamage = 10;
 let maxFireballDamage = 25;
 let minHeal = 20;
@@ -19,9 +19,15 @@ let currentFrame = 0; // Current frame index
 let frameCounter = 0; // Frame counter to control animation speed
 let frameDelay = 10; // Number of frames to wait before advancing to the next frame
 
+// Declare sound variables
+let punchSound;
+
 function preload() {
   // Load the spritesheet
   slimeSheet = loadImage('assets/slime.png');
+  
+  // Load the sound file
+  punchSound = loadSound('assets/punch.mp3');
 }
 
 function setup() {
@@ -29,10 +35,10 @@ function setup() {
   frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
   frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
   
-  let PunchButton = createButton('Punch'); // Changed from Basic Attack to Punch
+  let PunchButton = createButton('Punch');
   PunchButton.position(50, 250);
   PunchButton.size(150,50);
-  PunchButton.mousePressed(punch); // Changed from basicAttack to punch
+  PunchButton.mousePressed(punch);
 
   let FireballButton = createButton('Fireball');
   FireballButton.position(50,325);
@@ -44,10 +50,10 @@ function setup() {
   HealButton.size(150,50);
   HealButton.mousePressed(heal);
 
-  let ChargeButton = createButton('Charge') // Changed from Empower to Charge
-  ChargeButton.position(225,325); // Changed from Empower to Charge
-  ChargeButton.size(150,50) // Changed from Empower to Charge
-  ChargeButton.mousePressed(charge); // Changed from empower to charge
+  let ChargeButton = createButton('Charge')
+  ChargeButton.position(225,325);
+  ChargeButton.size(150,50)
+  ChargeButton.mousePressed(charge);
   
   // Create a textarea for game log
   gameLogArea = createElement('textarea');
@@ -105,20 +111,21 @@ function draw() {
   }
 }
 
-function punch() { // Changed from basicAttack to punch
+function punch() {
   if (generateRandomHitChance()) {
-    let damage = generateRandomDamage(5, 10); // Changed from minBasicDamage to minPunchDamage, maxBasicDamage to maxPunchDamage
+    let damage = generateRandomDamage(minPunchDamage, maxPunchDamage);
     slimeHP -= damage;
-    gameLog += "Player used punch! It did " + damage + " damage to slime!\n"; // Changed from basic attack to punch
+    gameLog += "Player used punch! It did " + damage + " damage to slime!\n";
+    punchSound.play(); // Play punch sound
   } else {
-    gameLog += "Your Punch missed!\n"; // Changed from Your Basic Attack missed! to Your Punch missed!
+    gameLog += "Your Punch missed!\n";
   }
   slimeTurn();
 }
 
 function fireball() {
   if (playerMP >= 6) {
-    let damage = generateRandomDamage(10, 25);
+    let damage = generateRandomDamage(minFireballDamage, maxFireballDamage);
     slimeHP -= damage;
     playerMP -= 6;
     gameLog += "Player used fireball! It did " + damage + " damage to slime!\n";
@@ -130,7 +137,7 @@ function fireball() {
 
 function heal() {
   if (playerMP >= 8) {
-    let healing = generateRandomDamage(20, 30);
+    let healing = generateRandomDamage(minHeal, maxHeal);
     playerMP -= 8;
     let healedAmount = Math.min(100 - playerHP, healing);
     playerHP += healedAmount;
@@ -141,16 +148,16 @@ function heal() {
   slimeTurn();
 }
 
-function charge() { // Changed from empower to charge
+function charge() {
   if (playerMP >= 10) {
     playerMP -= 10;
-    minPunchDamage += 1; // Changed from minBasicDamage to minPunchDamage
-    maxPunchDamage += 2; // Changed from maxBasicDamage to maxPunchDamage
+    minPunchDamage += 1;
+    maxPunchDamage += 2;
     minFireballDamage += 1;
     maxFireballDamage += 2;
     minHeal += 1;
     maxHeal += 2;
-    gameLog += "Player used Charge and now has increased damage and healing!\n"; // Changed from Empower to Charge
+    gameLog += "Player used Charge and now has increased damage and healing!\n";
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
   }
@@ -168,15 +175,15 @@ function slimeTurn() {
     if (generateRandomHitChance()) {
       let damage = generateRandomDamage(3, 7);
       slimeTotalDamage += damage;
-      gameLog += "Slime hit you for " + damage + " damage!\n"; // Changed from goblin to slime
+      gameLog += "Slime hit you for " + damage + " damage!\n";
     } else {
-      gameLog += "Slime's attack missed!\n"; // Changed from goblin's to slime's
+      gameLog += "Slime's attack missed!\n";
     }
   }
   playerHP -= slimeTotalDamage;
 
   if (playerHP <= 0) {
-    gameLog += "You have been defeated by the slime! Game over!\n"; // Changed from goblin to slime
+    gameLog += "You have been defeated by the slime! Game over!\n";
     return;
   }
 }
