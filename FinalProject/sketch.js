@@ -21,6 +21,10 @@ let frameDelay = 10; // Number of frames to wait before advancing to the next fr
 
 // Declare sound variables
 let punchSound;
+let fireballSound;
+let healSound;
+let chargeSound;
+let wompSound;
 
 function preload() {
   // Load the spritesheet
@@ -28,6 +32,10 @@ function preload() {
   
   // Load the sound file
   punchSound = loadSound('assets/punch.mp3');
+  fireballSound = loadSound('assets/fireball.mp3');
+  healSound = loadSound('assets/heal.mp3');
+  chargeSound = loadSound('assets/charge.mp3');
+  wompSound = loadSound('assets/womp.mp3');
 }
 
 function setup() {
@@ -119,18 +127,21 @@ function punch() {
     punchSound.play(); // Play punch sound
   } else {
     gameLog += "Your Punch missed!\n";
+    wompSound.play();
   }
   slimeTurn();
 }
 
 function fireball() {
-  if (playerMP >= 6) {
+  if (playerMP >= 10) {
     let damage = generateRandomDamage(minFireballDamage, maxFireballDamage);
     slimeHP -= damage;
-    playerMP -= 6;
+    playerMP -= 10;
     gameLog += "Player used fireball! It did " + damage + " damage to slime!\n";
+    fireballSound.play();
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
+    wompSound.play();
   }
   slimeTurn();
 }
@@ -142,8 +153,10 @@ function heal() {
     let healedAmount = Math.min(100 - playerHP, healing);
     playerHP += healedAmount;
     gameLog += "Player used heal and was healed for " + healedAmount + " health!\n";
+    healSound.play();
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
+    wompSound.play();
   }
   slimeTurn();
 }
@@ -158,8 +171,10 @@ function charge() {
     minHeal += 1;
     maxHeal += 2;
     gameLog += "Player used Charge and now has increased damage and healing!\n";
+    chargeSound.play();
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
+    wompSound.play();
   }
   slimeTurn();
 }
