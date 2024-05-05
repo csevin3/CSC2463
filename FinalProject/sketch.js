@@ -25,6 +25,7 @@ let fireballSound;
 let healSound;
 let chargeSound;
 let wompSound;
+let musicSound;
 
 function preload() {
   // Load the spritesheet
@@ -36,12 +37,15 @@ function preload() {
   healSound = loadSound('assets/heal.mp3');
   chargeSound = loadSound('assets/charge.mp3');
   wompSound = loadSound('assets/womp.mp3');
+  musicSound = loadSound('assets/music.mp3');
 }
 
 function setup() {
   createCanvas(600, 600);
   frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
   frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
+
+  musicSound.loop();
   
   let PunchButton = createButton('Punch');
   PunchButton.position(50, 250);
