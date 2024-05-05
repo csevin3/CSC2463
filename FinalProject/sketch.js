@@ -44,8 +44,6 @@ function setup() {
   createCanvas(600, 600);
   frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
   frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
-
-  musicSound.loop();
   
   let PunchButton = createButton('Punch');
   PunchButton.position(50, 250);
@@ -72,6 +70,9 @@ function setup() {
   gameLogArea.position(50, 120);
   gameLogArea.size(200, 100);
   gameLogArea.attribute('readonly', '');
+
+  // Start background music when the user clicks anything
+  document.addEventListener('click', startBackgroundMusic);
 }
 
 function draw() {
@@ -205,6 +206,10 @@ function slimeTurn() {
     gameLog += "You have been defeated by the slime! Game over!\n";
     return;
   }
+}
+
+function startBackgroundMusic() {
+  musicSound.loop();
 }
 
 function generateRandomDamage(min, max) {
