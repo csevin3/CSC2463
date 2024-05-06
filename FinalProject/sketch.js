@@ -27,6 +27,7 @@ let healSound; // Sound for heal action
 let chargeSound; // Sound for charge action
 let wompSound; // Sound for missed actions
 let musicSound; // Background music
+let winSound; // Sound for winning
 
 // Declare variables for Arduino integration
 let port; // Serial port for Arduino communication
@@ -54,6 +55,7 @@ function preload() {
   chargeSound = loadSound('assets/charge.mp3');
   wompSound = loadSound('assets/womp.mp3');
   musicSound = loadSound('assets/music.mp3');
+  winSound = loadSound('assets/win.mp3'); // Load win sound
 }
 
 // Setup function to initialize the game
@@ -193,12 +195,21 @@ function draw() {
     textAlign(CENTER, TOP);
     text("YOU WIN", width / 2, 10); // Display at the top with a margin of 10 pixels
     noLoop(); // Stop the draw loop to prevent further updates
+    
+    // Stop the background music
+    musicSound.stop();
+    
+    // Play win sound when the player wins
+    winSound.play();
   } else if (playerHP <= 0) {
     fill(255, 0, 0); // Red color
     textSize(32);
     textAlign(CENTER, TOP);
     text("GAME OVER", width / 2, 10); // Display at the top with a margin of 10 pixels
     noLoop(); // Stop the draw loop to prevent further updates
+    
+    // Stop the background music
+    musicSound.stop();
   }
 }
 
