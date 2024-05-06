@@ -27,6 +27,20 @@ let chargeSound;
 let wompSound;
 let musicSound;
 
+let port;
+let joyX = 0, joyY = 0, sw = 0;
+let connectButton;
+let circleX, circleY;
+let speed = 3;
+
+let musicStarted = false; // Variable to track if music has started
+
+// Variables to track button states
+let punchButtonState = false;
+let fireballButtonState = false;
+let healButtonState = false;
+let chargeButtonState = false;
+
 function preload() {
   // Load the spritesheet
   slimeSheet = loadImage('assets/slime.png');
@@ -41,7 +55,14 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(600, 600);
+  port = createSerial();
+  createCanvas(400, 400);
+  circleX = width / 2;
+  circleY = height / 2
+
+  connectButton = createButton("Connect")
+  connectButton.mousePressed(connect);
+
   frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
   frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
   
@@ -72,11 +93,61 @@ function setup() {
   gameLogArea.attribute('readonly', '');
 
   // Start background music when the user clicks anything
-  document.addEventListener('click', startBackgroundMusic);
+  document.addEventListener('click', startBackgroundMusicOnce);
 }
 
 function draw() {
   background(255);
+
+  let str = port.readUntil("\n");
+  let values = str.split(",");
+  if (values.length > 2) {
+    joyX = values[0];
+    joyY = values[1];
+    sw = values[2];
+
+    if (joyX > 0) {
+      circleX += speed;
+    } else if (joyX < 0) {
+      circleX -= speed;
+    }
+
+    if (joyY > 0) {
+      circleY += speed;
+    } else if (joyY < 0) {
+      circleY -= speed;
+    }
+  }
+
+  if (sw == 1) {
+    fill("black");
+  } else {
+    fill("white");
+  }
+  circle(circleX, circleY, 50);
+  
+  // Check if the circle is pressed on a button
+  if (sw == 1) { // Assuming 'sw' indicates a button press
+    if (!punchButtonState && isCirclePressedOnButton(circleX, circleY, 50, 250, 150, 50)) {
+      punch();
+      punchButtonState = true;
+    } else if (!fireballButtonState && isCirclePressedOnButton(circleX, circleY, 50, 325, 150, 50)) {
+      fireball();
+      fireballButtonState = true;
+    } else if (!healButtonState && isCirclePressedOnButton(circleX, circleY, 225, 250, 150, 50)) {
+      heal();
+      healButtonState = true;
+    } else if (!chargeButtonState && isCirclePressedOnButton(circleX, circleY, 225, 325, 150, 50)) {
+      charge();
+      chargeButtonState = true;
+    }
+  } else {
+    // Reset button states when the button is released
+    punchButtonState = false;
+    fireballButtonState = false;
+    healButtonState = false;
+    chargeButtonState = false;
+  }
   
   // Increment frame counter
   frameCounter++;
@@ -121,6 +192,14 @@ function draw() {
     textAlign(CENTER, TOP);
     text("GAME OVER", width / 2, 10); // Display at the top with a margin of 10 pixels
     noLoop(); // Stop the draw loop to prevent further updates
+  }
+}
+
+function connect() {
+  if (!port.opened()) {
+    port.open('Arduino', 9600);
+  } else {
+    port.close();
   }
 }
 
@@ -208,8 +287,12 @@ function slimeTurn() {
   }
 }
 
-function startBackgroundMusic() {
-  musicSound.loop();
+function startBackgroundMusicOnce() {
+  if (!musicStarted) {
+    musicSound.loop();
+    musicStarted = true;
+    document.removeEventListener('click', startBackgroundMusicOnce); // Remove the event listener after music starts
+  }
 }
 
 function generateRandomDamage(min, max) {
@@ -218,4 +301,14 @@ function generateRandomDamage(min, max) {
 
 function generateRandomHitChance() {
   return Math.random() <= 0.5;
+}
+
+function isCirclePressedOnButton(circleX, circleY, buttonX, buttonY, buttonWidth, buttonHeight) {
+  // Calculate distance between circle center and button center
+  let dx = circleX - buttonX - buttonWidth / 2;
+  let dy = circleY - buttonY - buttonHeight / 2;
+  let distance = sqrt(dx * dx + dy * dy);
+
+  // Check if distance is less than circle radius
+  return distance < 25; // Assuming circle radius is 25 (adjust this according to your circle size)
 }
