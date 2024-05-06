@@ -1,37 +1,39 @@
-let playerHP = 100;
-let playerMP = 50;
-let slimeHP = 80;
-let gameLog = "";
+// Declare variables for player and slime health points, and game log
+let playerHP = 100; // Player's health points
+let playerMP = 50; // Player's mana points
+let slimeHP = 80; // Slime's health points
+let gameLog = ""; // Log to track game events
 
 // Declare variables for damage and heal ranges
-let minPunchDamage = 5;
-let maxPunchDamage = 10;
-let minFireballDamage = 10;
-let maxFireballDamage = 25;
-let minHeal = 20;
-let maxHeal = 30;
+let minPunchDamage = 5; // Minimum damage for punch action
+let maxPunchDamage = 10; // Maximum damage for punch action
+let minFireballDamage = 10; // Minimum damage for fireball action
+let maxFireballDamage = 25; // Maximum damage for fireball action
+let minHeal = 20; // Minimum healing amount
+let maxHeal = 30; // Maximum healing amount
 
-let gameLogArea;
-
-let slimeSheet; // Variable to hold the spritesheet image
-let frameWidth, frameHeight; // Width and height of each frame
+// Declare variables for game elements
+let gameLogArea; // TextArea to display game log
+let slimeSheet; // Image variable for slime spritesheet
+let frameWidth, frameHeight; // Width and height of each frame in the spritesheet
 let currentFrame = 0; // Current frame index
 let frameCounter = 0; // Frame counter to control animation speed
 let frameDelay = 10; // Number of frames to wait before advancing to the next frame
 
 // Declare sound variables
-let punchSound;
-let fireballSound;
-let healSound;
-let chargeSound;
-let wompSound;
-let musicSound;
+let punchSound; // Sound for punch action
+let fireballSound; // Sound for fireball action
+let healSound; // Sound for heal action
+let chargeSound; // Sound for charge action
+let wompSound; // Sound for missed actions
+let musicSound; // Background music
 
-let port;
-let joyX = 0, joyY = 0, sw = 0;
-let connectButton;
-let circleX, circleY;
-let speed = 3;
+// Declare variables for Arduino integration
+let port; // Serial port for Arduino communication
+let joyX = 0, joyY = 0, sw = 0; // Variables to store joystick and switch values
+let connectButton; // Button to connect/disconnect Arduino
+let circleX, circleY; // Position of the joystick circle
+let speed = 3; // Speed of joystick movement
 
 let musicStarted = false; // Variable to track if music has started
 
@@ -41,11 +43,11 @@ let fireballButtonState = false;
 let healButtonState = false;
 let chargeButtonState = false;
 
+// Preload function to load assets before setup
 function preload() {
-  // Load the spritesheet
-  slimeSheet = loadImage('assets/slime.png');
+  slimeSheet = loadImage('assets/slime.png'); // Load the spritesheet
   
-  // Load the sound file
+  // Load the sound files
   punchSound = loadSound('assets/punch.mp3');
   fireballSound = loadSound('assets/fireball.mp3');
   healSound = loadSound('assets/heal.mp3');
@@ -54,18 +56,20 @@ function preload() {
   musicSound = loadSound('assets/music.mp3');
 }
 
+// Setup function to initialize the game
 function setup() {
-  port = createSerial();
-  createCanvas(400, 400);
-  circleX = width / 2;
-  circleY = height / 2
+  port = createSerial(); // Create serial connection for Arduino
+  createCanvas(400, 400); // Create a canvas for the game
+  circleX = width / 2; // Initialize joystick circle X position
+  circleY = height / 2; // Initialize joystick circle Y position
 
-  connectButton = createButton("Connect")
-  connectButton.mousePressed(connect);
+  connectButton = createButton("Connect") // Create connect/disconnect button
+  connectButton.mousePressed(connect); // Add event listener to connect/disconnect button
 
-  frameWidth = slimeSheet.width; // Width of each frame is the same as the spritesheet width
-  frameHeight = slimeSheet.height / 2; // Height of each frame is half the spritesheet height
+  frameWidth = slimeSheet.width; // Set frame width as spritesheet width
+  frameHeight = slimeSheet.height / 2; // Set frame height as half of spritesheet height
   
+  // Create buttons for player actions
   let PunchButton = createButton('Punch');
   PunchButton.position(50, 250);
   PunchButton.size(150,50);
@@ -96,9 +100,11 @@ function setup() {
   document.addEventListener('click', startBackgroundMusicOnce);
 }
 
+// Draw function to update game elements
 function draw() {
-  background(255);
+  background(255); // Set background color
 
+  // Read joystick and switch values from Arduino
   let str = port.readUntil("\n");
   let values = str.split(",");
   if (values.length > 2) {
@@ -106,6 +112,7 @@ function draw() {
     joyY = values[1];
     sw = values[2];
 
+    // Update joystick circle position based on joystick values
     if (joyX > 0) {
       circleX += speed;
     } else if (joyX < 0) {
@@ -119,15 +126,16 @@ function draw() {
     }
   }
 
+  // Change joystick circle color based on switch value
   if (sw == 1) {
     fill("black");
   } else {
     fill("white");
   }
-  circle(circleX, circleY, 50);
+  circle(circleX, circleY, 50); // Draw joystick circle
   
-  // Check if the circle is pressed on a button
-  if (sw == 1) { // Assuming 'sw' indicates a button press
+  // Check if the joystick circle is pressed on a button
+  if (sw == 1) {
     if (!punchButtonState && isCirclePressedOnButton(circleX, circleY, 50, 250, 150, 50)) {
       punch();
       punchButtonState = true;
@@ -152,7 +160,7 @@ function draw() {
   // Increment frame counter
   frameCounter++;
   
-  // Display the current frame at the top-left corner of the canvas
+  // Display slime animation
   let xPos = 300; // Adjust X position as needed
   let yPos = 100; // Adjust Y position as needed
   image(slimeSheet, xPos, yPos, frameWidth * 2, frameHeight * 2, 0, currentFrame * frameHeight, frameWidth, frameHeight);
@@ -176,7 +184,6 @@ function draw() {
   
   // Update game log content
   gameLogArea.value(gameLog);
-
   gameLogArea.elt.scrollTop = gameLogArea.elt.scrollHeight;
 
   // Check if slime's health is 0 or below, display YOU WIN if true
@@ -195,6 +202,7 @@ function draw() {
   }
 }
 
+// Function to establish or terminate Arduino connection
 function connect() {
   if (!port.opened()) {
     port.open('Arduino', 9600);
@@ -203,6 +211,7 @@ function connect() {
   }
 }
 
+// Function to handle player's punch action
 function punch() {
   if (generateRandomHitChance()) {
     let damage = generateRandomDamage(minPunchDamage, maxPunchDamage);
@@ -211,25 +220,27 @@ function punch() {
     punchSound.play(); // Play punch sound
   } else {
     gameLog += "Your Punch missed!\n";
-    wompSound.play();
+    wompSound.play(); // Play missed action sound
   }
-  slimeTurn();
+  slimeTurn(); // Proceed to slime's turn
 }
 
+// Function to handle player's fireball action
 function fireball() {
   if (playerMP >= 10) {
     let damage = generateRandomDamage(minFireballDamage, maxFireballDamage);
     slimeHP -= damage;
     playerMP -= 10;
     gameLog += "Player used fireball! It did " + damage + " damage to slime!\n";
-    fireballSound.play();
+    fireballSound.play(); // Play fireball sound
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
-    wompSound.play();
+    wompSound.play(); // Play failed action sound
   }
-  slimeTurn();
+  slimeTurn(); // Proceed to slime's turn
 }
 
+// Function to handle player's heal action
 function heal() {
   if (playerMP >= 8) {
     let healing = generateRandomDamage(minHeal, maxHeal);
@@ -237,14 +248,16 @@ function heal() {
     let healedAmount = Math.min(100 - playerHP, healing);
     playerHP += healedAmount;
     gameLog += "Player used heal and was healed for " + healedAmount + " health!\n";
-    healSound.play();
+    healSound.play(); // Play heal sound
+    sendHeal(); // Send heal command to Arduino
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
-    wompSound.play();
+    wompSound.play(); // Play failed action sound
   }
-  slimeTurn();
+  slimeTurn(); // Proceed to slime's turn
 }
 
+// Function to handle player's charge action
 function charge() {
   if (playerMP >= 10) {
     playerMP -= 10;
@@ -255,14 +268,16 @@ function charge() {
     minHeal += 1;
     maxHeal += 2;
     gameLog += "Player used Charge and now has increased damage and healing!\n";
-    chargeSound.play();
+    chargeSound.play(); // Play charge sound
+    sendCharge(); // Send charge command to Arduino
   } else {
     gameLog += "Your action failed! You do not have enough MP!\n";
-    wompSound.play();
+    wompSound.play(); // Play failed action sound
   }
-  slimeTurn();
+  slimeTurn(); // Proceed to slime's turn
 }
 
+// Function for slime's turn
 function slimeTurn() {
   if (slimeHP <= 0) {
     gameLog += "You have defeated the slime! Congratulations!\n";
@@ -287,22 +302,26 @@ function slimeTurn() {
   }
 }
 
+// Function to start background music once on any click event
 function startBackgroundMusicOnce() {
   if (!musicStarted) {
-    musicSound.loop();
+    musicSound.loop(); // Start background music
     musicStarted = true;
     document.removeEventListener('click', startBackgroundMusicOnce); // Remove the event listener after music starts
   }
 }
 
+// Function to generate random damage within a range
 function generateRandomDamage(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Function to generate random hit chance
 function generateRandomHitChance() {
   return Math.random() <= 0.5;
 }
 
+// Function to check if the circle is pressed on a button
 function isCirclePressedOnButton(circleX, circleY, buttonX, buttonY, buttonWidth, buttonHeight) {
   // Calculate distance between circle center and button center
   let dx = circleX - buttonX - buttonWidth / 2;
@@ -311,4 +330,25 @@ function isCirclePressedOnButton(circleX, circleY, buttonX, buttonY, buttonWidth
 
   // Check if distance is less than circle radius
   return distance < 25; // Assuming circle radius is 25 (adjust this according to your circle size)
+}
+
+// Function to send charge command to Arduino
+function sendCharge() {
+  if (port && port.opened()) {
+    port.write('C\n');
+  }
+}
+
+// Function to send heal command to Arduino
+function sendHeal() {
+  if (port && port.opened()) {
+    port.write('H\n');
+  }
+}
+
+// Function to send player's current life count to Arduino
+function sendLifeCount() {
+  if (port && port.opened()) {
+    port.write('L'+playerHP);
+  }
 }
